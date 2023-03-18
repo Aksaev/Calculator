@@ -14,44 +14,57 @@ public class CalculatorController {
         this.calculatorService = calculatorService;
     }
 
-    @GetMapping()
+    @GetMapping
     public String helloCalculator() {
         return "Добро пожаловать в калькулятор";
     }
 
     @GetMapping("/plus")
-    public String plusCalculator(@RequestParam(required = false) String num1, @RequestParam(required = false) String num2) {
-        if (num1 == null || num2 == null || num1.isEmpty() || num2.isEmpty()) {
-            return "<b>Введите корректно num1 и num2</b>";
-        }
-        return num1 + " + " + num2 + " = " + calculatorService.plus(Integer.parseInt(num1), Integer.parseInt(num2));
+    public String plusCalculator(@RequestParam(value = "num1", required = false) Integer num1,
+                                 @RequestParam(value = "num2", required = false) Integer num2) {
+        return buildView(num1, num2, "+");
     }
 
     @GetMapping("/minus")
-    public String minusCalculator(@RequestParam(required = false) String num1, @RequestParam(required = false) String num2) {
-        if (num1 == null || num2 == null || num1.isEmpty() || num2.isEmpty()) {
-            return "<b>Введите корректно num1 и num2</b>";
-        }
-        return num1 + " - " + num2 + " = " + calculatorService.minus(Integer.parseInt(num1), Integer.parseInt(num2));
+    public String minusCalculator(@RequestParam(value = "num1", required = false) Integer num1,
+                                  @RequestParam(value = "num2", required = false) Integer num2) {
+        return buildView(num1, num2, "-");
     }
 
     @GetMapping("/multiply")
-    public String multiplyCalculator(@RequestParam(required = false) String num1, @RequestParam(required = false) String num2) {
-        if (num1 == null || num2 == null || num1.isEmpty() || num2.isEmpty()) {
-            return "<b>Введите корректно num1 и num2</b>";
-        }
-        return num1 + " * " + num2 + " = " + calculatorService.multiply(Integer.parseInt(num1), Integer.parseInt(num2));
+    public String multiplyCalculator(@RequestParam(value = "num1", required = false) Integer num1,
+                                     @RequestParam(value = "num2", required = false) Integer num2) {
+        return buildView(num1, num2, "*");
     }
 
     @GetMapping("/divide")
-    public String divideCalculator(@RequestParam(required = false) String num1, @RequestParam(required = false) String num2) {
-        if (num1 == null || num2 == null || num1.isEmpty() || num2.isEmpty()) {
+    public String divideCalculator(@RequestParam(value = "num1", required = false) Integer num1,
+                                   @RequestParam(value = "num2", required = false) Integer num2) {
+        return buildView(num1, num2, "/");
+    }
+
+    private String buildView(Integer num1, Integer num2, String operation) {
+        if (num1 == null || num2 == null) {
             return "<b>Введите корректно num1 и num2</b>";
         }
-        if (num2.equals("0")) {
+        if ("/".equals(operation) && num2 == 0) {
             return "<b>Делить на \"0\" нельзя!</b>";
         }
-        return num1 + " / " + num2 + " = " + calculatorService.divide(Integer.parseInt(num1), Integer.parseInt(num2));
+        Number result;
+        switch (operation) {
+            case "-":
+                result = calculatorService.minus(num1, num2);
+                break;
+            case "*":
+                result = calculatorService.multiply(num1, num2);
+                break;
+            case "/":
+                result = calculatorService.divide(num1, num2);
+                break;
+            default:
+                result = calculatorService.plus(num1, num2);
+        }
+        return num1 + " " + operation + " " + num2 + " = " + result;
     }
 
 }
